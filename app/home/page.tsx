@@ -506,8 +506,9 @@ function Contact(): JSX.Element {
     if (!res.ok) throw new Error(data?.error || "Failed to send");
     form.reset();
     alert("Thanks! Your message is on its way ✉️");
-  } catch (err: any) {
-    alert(err?.message || "Something went wrong.");
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Something went wrong.";
+    alert(message);
   } finally {
     setPending(false);
   }
