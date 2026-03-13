@@ -1,146 +1,263 @@
 "use client";
 
-import React, { useMemo, useState, useEffect, JSX } from "react";
+import React, { JSX, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
+import { ThemeProvider, useTheme } from "next-themes";
 import type { LucideIcon } from "lucide-react";
-import { Github, Linkedin, Mail, ExternalLink, FileDown, ArrowRight, Sparkles, Code2, Briefcase, Phone, Globe, Star, Moon, Sun, CodeXml} from "lucide-react";
+import {
+  ArrowRight,
+  BadgeCheck,
+  Briefcase,
+  Code2,
+  CodeXml,
+  ExternalLink,
+  FileDown,
+  Github,
+  Globe,
+  Linkedin,
+  Mail,
+  MapPin,
+  Moon,
+  Phone,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Sun,
+  Workflow,
+} from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ThemeProvider, useTheme } from "next-themes";
-import Image from "next/image";
-import { Code } from 'lucide-react';
-import Link from "next/link";
-import type { Transition, Easing } from "framer-motion";
+import { cn } from "@/lib/utils";
+import type { Easing, Transition } from "framer-motion";
 
 const EASE: Easing = [0.22, 1, 0.36, 1];
-
 const SPRING_SOFT: Transition = { type: "spring", stiffness: 220, damping: 22 };
-const SPRING_SNAPPY: Transition = { type: "spring", stiffness: 340, damping: 18 };
+const SPRING_SNAPPY: Transition = { type: "spring", stiffness: 340, damping: 20 };
 
 const container = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.08 }
-  }
+    transition: { staggerChildren: 0.08 },
+  },
 } as const;
 
 const item = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 120, damping: 16 } }
+  hidden: { opacity: 0, y: 16 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 120, damping: 16 },
+  },
 } as const;
 
-const profile = {
-  name: "Abiral Panta",
-  role: "Full‑Stack Developer | Next.js • Prisma • AI",
-  blurb:
-    "I craft fast, elegant web apps with delightful UX, strong systems design, and pragmatic attention to detail.",
-  location: "Kathmandu, Nepal",
-  social: {
-    github: "https://github.com/Abiral12",
-    linkedin: "https://linkedin.com/in/abiral-panta-89704b272/",
-    email: "mailto:abiralpanta39@gmail.com",
-    website: "https://example.com",
-    resume: "/resume.pdf"
-  }
-} as const;
-
-const skills: string[] = [
-  "Next.js 15 (App Router)",
-  "TypeScript",
-  "shadcn/ui",
-  "Tailwind CSS",
-  "Framer Motion",
-  "Prisma + PostgreSQL",
-  "MongoDB",
-  "tRPC / REST",
-  "Vercel",
-  "Playwright / Vitest",
-  "CI/CD",
-  "System Design"
-];
-
-interface Project {
+type Project = {
   title: string;
-  desc: string;
+  summary: string;
+  impact: string;
+  image: string;
   tags: string[];
-  image?: string;
-  links?: { live?: string; repo?: string };
-}
+  links: {
+    live?: string;
+    repo?: string;
+  };
+};
 
-const projects: Project[] = [
-  {
-    title: "PCOMS — Office Management System",
-    desc: " office management system to check what employees are doing and manage their tasks. Built with Next.js, Prisma, Postgres, and QStash for notification schedules.",
-    image: "/image.png",
-    tags: ["Next.js", "Prisma", "Postgres", "QStash"],
-    links: { live: "https://pcoms.vercel.app/", repo: "" }
-  },
-  {
-    title: "Stock Management System",
-    desc: "A full‑stack inventory and order management app with role‑based access, reporting, and CSV import/export.",
-    image: "/image1.png",
-    tags: ["Next.js", "ExpressJs", "NodeJs", "MongoDB", "Chart.js", "Tailwind", "Framer Motion", "Vercel"],
-    links: { live: "https://foreveryoung8848.vercel.app/", repo: "https://github.com/Abiral12/Stock-Management-system" }
-  },
-  {
-    title: "Medicine Scanner",
-    desc: "A mobile‑friendly web app to scan medicine barcodes and retrieve drug information using a open router API with regex fallback .",
-    image: "/image2.jpg",
-    tags: ["Next.js", "Tesseractjs", "Workers", "openAi", "qwenAi", "NemotronAi", "prisma", "PostgreSQL"],
-    links: { live: "#", repo: "#" }
-  },
-    {
-    title: "Pharmacy Management System",
-    desc: "A comprehensive pharmacy management system with inventory tracking, Ai Medicine scanner, Rack management, sales processing, and reporting features. Built with Next.js, Prisma, and PostgreSQL.",
-    image: "/image3.png",
-    tags: ["Next.js", "Tesseractjs", "Workers", "openAi", "qwenAi", "NemotronAi", "prisma", "PostgreSQL", "Tailwind", "Framer Motion", "Vercel"],
-    links: { live: "#", repo: "#" }
-  }
-];
-
-interface ExperienceItem {
+type ExperienceItem = {
   company: string;
   role: string;
   period: string;
   bullets: string[];
-}
+};
+
+type Highlight = {
+  label: string;
+  value: string;
+  icon: LucideIcon;
+};
+
+const profile = {
+  name: "Abiral Panta",
+  role: "Full-Stack Developer focused on real business systems",
+  intro:
+    "I build production-ready web applications with strong backend thinking, clean UI, and systems that solve actual operational problems.",
+  about:
+    "I am a full-stack developer from Kathmandu who enjoys turning messy business workflows into usable software. My strongest work sits at the intersection of product thinking, backend logic, database design, and polished frontend implementation. I do not just build pages—I design flows, permissions, APIs, data models, and operational tools that help teams work faster and with less friction.",
+  niche:
+    "Most of my recent work has been around management systems, pharmacy workflows, OCR and AI-assisted tools, and scalable Next.js applications with real business rules.",
+  location: "Kathmandu, Nepal",
+  socials: {
+    github: "https://github.com/Abiral12",
+    linkedin: "https://linkedin.com/in/abiral-panta-89704b272/",
+    email: "mailto:abiralpanta39@gmail.com",
+    resume: "/resume.pdf",
+    website: "#",
+  },
+} as const;
+
+const highlights: Highlight[] = [
+  {
+    label: "Primary stack",
+    value: "Next.js, TypeScript, PostgreSQL, Prisma, Supabase",
+    icon: Code2,
+  },
+  {
+    label: "What I build",
+    value: "SaaS dashboards, internal tools, OCR and AI workflows",
+    icon: Workflow,
+  },
+  {
+    label: "What I care about",
+    value: "Maintainability, performance, access control, product clarity",
+    icon: ShieldCheck,
+  },
+];
+
+const skills = [
+  "Next.js",
+  "React",
+  "TypeScript",
+  "Node.js",
+  "Prisma",
+  "PostgreSQL",
+  "Supabase",
+  "MongoDB",
+  "Tailwind CSS",
+  "shadcn/ui",
+  "Framer Motion",
+  "REST APIs",
+  "RBAC",
+  "OCR workflows",
+  "AI integration",
+  "System design",
+  "GitHub Actions",
+  "Docker",
+] as const;
+
+const projects: Project[] = [
+  {
+    title: "MyPharmaCity / Pharmacy Management System",
+    summary:
+      "A pharmacy operations platform built for real business use, covering inventory, sales, rack management, AI medicine scanning, and multi-step subscription onboarding.",
+    impact:
+      "This project reflects my backend and product strength most clearly: database design, business rules, multi-tenant thinking, API structure, and admin workflows.",
+    image: "/image3.png",
+    tags: [
+      "Next.js",
+      "TypeScript",
+      "PostgreSQL",
+      "Prisma",
+      "Supabase",
+      "OCR",
+      "AI Integration",
+      "RBAC",
+    ],
+    links: {
+      live: "#",
+      repo: "#",
+    },
+  },
+  {
+    title: "PCOMS — Office Management System",
+    summary:
+      "An internal office system for managing employee work visibility, task tracking, and scheduled notifications with a practical business-first approach.",
+    impact:
+      "Demonstrates my ability to build clean operational tools that are useful for teams, not just visually polished demos.",
+    image: "/image.png",
+    tags: ["Next.js", "Prisma", "PostgreSQL", "QStash", "Task Systems"],
+    links: {
+      live: "https://pcoms.vercel.app/",
+      repo: "",
+    },
+  },
+  {
+    title: "Stock Management System",
+    summary:
+      "A full-stack inventory platform with reporting, role-aware access, import/export flows, and administrative controls.",
+    impact:
+      "Highlights my ability to work across frontend, backend, data handling, and business reporting in one product.",
+    image: "/image1.png",
+    tags: [
+      "Next.js",
+      "Express",
+      "Node.js",
+      "MongoDB",
+      "Chart.js",
+      "Tailwind",
+    ],
+    links: {
+      live: "https://foreveryoung8848.vercel.app/",
+      repo: "https://github.com/Abiral12/Stock-Management-system",
+    },
+  },
+  {
+    title: "Medicine Scanner",
+    summary:
+      "A mobile-friendly scanner flow for extracting medicine information using OCR, AI models, and fallback parsing logic.",
+    impact:
+      "Shows that I can combine modern frontend UX with applied AI and error-tolerant backend workflow design.",
+    image: "/image2.jpg",
+    tags: [
+      "Next.js",
+      "Tesseract.js",
+      "Workers",
+      "OpenRouter",
+      "Regex Fallback",
+      "PostgreSQL",
+    ],
+    links: {
+      live: "#",
+      repo: "#",
+    },
+  },
+];
 
 const experience: ExperienceItem[] = [
   {
     company: "Paradox City Inc",
-    role: "Intern Full‑Stack Developer/Team Lead",
+    role: "Intern Full-Stack Developer / Team Lead",
     period: "Aug 2025 — Present",
     bullets: [
-      "Designed and shipped production Next.js apps with modern UI patterns (drag/drop, resizable windows, advanced tables).",
-      "Built OCR and AI‑assisted workflows to reduce manual pharmacy intake time by 60%.",
-      "Implemented rack FEFO allocation logic and shelf‑capacity planning for multi‑tenant orgs."
-    ]
+      "Built production-grade Next.js applications with modern UX patterns, structured APIs, and maintainable component systems.",
+      "Worked on pharmacy-oriented business systems involving OCR, AI-assisted data extraction, rack logic, and subscription workflows.",
+      "Led implementation decisions across frontend, backend, and database layers while coordinating delivery with practical product goals.",
+    ],
   },
   {
-    company: "open‑source projects",
-    role: "Freelance Developer / Debugger",
+    company: "Independent and open-source work",
+    role: "Developer / Debugger",
     period: "2023 — Present",
     bullets: [
-      "Auth UI components, data‑viz, and DX tooling in TypeScript.",
-      "Maintainer of small libraries and CLI utilities."
-    ]
-  }
+      "Built and debugged full-stack projects spanning authentication, dashboards, forms, CRUD systems, and database integration.",
+      "Improved DX, fixed architecture issues, and shipped reusable UI and TypeScript-based solutions across multiple projects.",
+    ],
+  },
 ];
 
-function SectionTitle({ icon: Icon, title, subtitle }: { icon: LucideIcon; title: string; subtitle?: string }) {
+function SectionTitle({
+  icon: Icon,
+  title,
+  subtitle,
+}: {
+  icon: LucideIcon;
+  title: string;
+  subtitle?: string;
+}) {
   return (
-    <div className="mb-6 flex items-center gap-3">
-      <div className="rounded-2xl p-2 border shadow-sm">
+    <div className="mb-8 flex items-start gap-3">
+      <div className="rounded-2xl border bg-background p-2.5 shadow-sm">
         <Icon className="size-5" />
       </div>
       <div>
-        <h2 className="text-xl font-semibold leading-tight">{title}</h2>
-        {subtitle ? <p className="text-sm text-muted-foreground">{subtitle}</p> : null}
+        <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
+        {subtitle ? <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p> : null}
       </div>
     </div>
   );
@@ -148,68 +265,68 @@ function SectionTitle({ icon: Icon, title, subtitle }: { icon: LucideIcon; title
 
 function ThemeToggle(): JSX.Element | null {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState<boolean>(false);
-  useEffect(() => setMounted(true), []);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   if (!mounted) return null;
+
   const isDark = theme === "dark";
+
   return (
     <Button
       variant="ghost"
       size="icon"
       aria-label="Toggle theme"
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      title={isDark ? "Switch to light" : "Switch to dark"}
     >
       {isDark ? <Sun className="size-5" /> : <Moon className="size-5" />}
     </Button>
   );
 }
+
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <motion.a
       href={href}
       whileHover={{ y: -2 }}
       transition={SPRING_SOFT}
-      className="relative inline-block px-1 py-0.5"
+      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
     >
-      <span className="relative z-10">{children}</span>
-      {/* underline grows from center */}
-      <motion.span
-        layoutId="nav-underline" // shared ID = buttery transitions between links
-        className="absolute left-1/2 -bottom-[2px] h-[2px] w-0 bg-foreground/50"
-        initial={false}
-        whileHover={{ left: 0, width: "100%" }}
-        transition={{ duration: 0.22, ease: EASE }}
-      />
+      {children}
     </motion.a>
   );
 }
 
-
-function Header(): JSX.Element {
+function Header() {
   return (
-    <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-      <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="font-semibold tracking-tight flex items-center gap-2">
-          <Code className="size-5" /> {profile.name} <CodeXml className="size-5" />
+    <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
+          <CodeXml className="size-5" />
+          <span>{profile.name}</span>
         </Link>
-        <nav className="hidden md:flex items-center gap-5 text-sm">
-  <NavLink href="#about">About</NavLink>
-  <NavLink href="#skills">Skills</NavLink>
-  <NavLink href="#projects">Projects</NavLink>
-  <NavLink href="#experience">Experience</NavLink>
-  <NavLink href="#contact">Contact</NavLink>
-</nav>
+
+        <nav className="hidden items-center gap-5 md:flex">
+          <NavLink href="#about">About</NavLink>
+          <NavLink href="#skills">Skills</NavLink>
+          <NavLink href="#projects">Projects</NavLink>
+          <NavLink href="#experience">Experience</NavLink>
+          <NavLink href="#contact">Contact</NavLink>
+        </nav>
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
-            <a href={profile.social.resume}>
+            <a href={profile.socials.resume}>
               <FileDown className="mr-2 size-4" /> Resume
             </a>
           </Button>
           <Button asChild size="sm">
-            <a href={profile.social.github} target="_blank" rel="noreferrer">
+            <a href={profile.socials.github} target="_blank" rel="noreferrer">
               <Github className="mr-2 size-4" /> GitHub
             </a>
           </Button>
@@ -219,8 +336,9 @@ function Header(): JSX.Element {
   );
 }
 
-function MButton(props: React.ComponentProps<typeof Button>) {
+function MotionButton(props: React.ComponentProps<typeof Button>) {
   const { children, className, ...rest } = props;
+
   return (
     <motion.div
       whileHover={{ y: -2, scale: 1.02 }}
@@ -228,102 +346,167 @@ function MButton(props: React.ComponentProps<typeof Button>) {
       transition={SPRING_SNAPPY}
       className="inline-block"
     >
-      <Button {...rest} className={className}>{children}</Button>
+      <Button {...rest} className={className}>
+        {children}
+      </Button>
     </motion.div>
   );
 }
 
-
-function Hero(): JSX.Element {
+function Hero() {
   return (
-    <section id="home" className="relative overflow-clip">
-      <div className="mx-auto max-w-6xl px-4 pt-16 pb-12 grid md:grid-cols-2 gap-10 items-center">
-        <motion.div variants={container} initial="hidden" animate="show">
-          <motion.h1 variants={item} className="text-3xl md:text-5xl font-bold tracking-tight leading-tight">
-            Building delightful, high‑performance web experiences
-          </motion.h1>
-          <motion.p variants={item} className="mt-4 text-base md:text-lg text-muted-foreground">
-            {profile.blurb}
-          </motion.p>
-          <motion.div variants={item} className="mt-6 flex flex-wrap gap-3">
-           <MButton asChild>
-  <a href="#projects">
-    View Projects <ArrowRight className="ml-2 size-4" />
-  </a>
-</MButton>
-            <MButton asChild>
-  <a href={profile.social.linkedin} target="_blank" rel="noreferrer">
-    <Linkedin className="mr-2 size-4" /> LinkedIn
-  </a>
-</MButton>
+    <section id="home" className="relative overflow-hidden border-b">
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,hsl(var(--muted))_0,transparent_35%),radial-gradient(circle_at_bottom_left,hsl(var(--muted))_0,transparent_35%)]" />
 
-<MButton asChild>
-  <a href={profile.social.website} target="_blank" rel="noreferrer">
-    <Globe className="mr-2 size-4" /> Website
-  </a>
-</MButton>
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-[1.25fr_0.95fr] md:py-24">
+        <motion.div variants={container} initial="hidden" animate="show">
+          <motion.div variants={item} className="mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm text-muted-foreground">
+            <BadgeCheck className="size-4" />
+            Full-stack developer building real-world systems
+          </motion.div>
+
+          <motion.h1
+            variants={item}
+            className="max-w-3xl text-4xl font-bold tracking-tight md:text-6xl"
+          >
+            I build software that solves operational problems, not just pretty screens.
+          </motion.h1>
+
+          <motion.p variants={item} className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+            {profile.intro}
+          </motion.p>
+
+          <motion.div variants={item} className="mt-7 flex flex-wrap gap-3">
+            <MotionButton asChild>
+              <a href="#projects">
+                View projects <ArrowRight className="ml-2 size-4" />
+              </a>
+            </MotionButton>
+            <MotionButton asChild variant="outline">
+              <a href={profile.socials.linkedin} target="_blank" rel="noreferrer">
+                <Linkedin className="mr-2 size-4" /> LinkedIn
+              </a>
+            </MotionButton>
+            <MotionButton asChild variant="outline">
+              <a href={profile.socials.email}>
+                <Mail className="mr-2 size-4" /> Contact me
+              </a>
+            </MotionButton>
+          </motion.div>
+
+          <motion.div
+            variants={item}
+            className="mt-10 grid gap-3 sm:grid-cols-3"
+          >
+            {highlights.map((highlight) => {
+              const Icon = highlight.icon;
+              return (
+                <Card key={highlight.label} className="border-border/70 bg-background/70">
+                  <CardContent className="p-4">
+                    <Icon className="mb-3 size-5 text-muted-foreground" />
+                    <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                      {highlight.label}
+                    </p>
+                    <p className="mt-2 text-sm font-medium leading-6">{highlight.value}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </motion.div>
         </motion.div>
 
-        <div className="aspect-[4/3] w-full rounded-3xl border bg-gradient-to-br from-muted to-background p-2 group">
-  <motion.div
-    whileHover={{ scale: 1.01 }}
-    transition={SPRING_SOFT}
-    className="h-full w-full rounded-2xl border bg-background overflow-hidden relative"
-  >
-            <div className="h-full w-full rounded-2xl border bg-background grid place-items-center text-center ">
-              
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: EASE }}
+          className="relative"
+        >
+          <div className="rounded-[28px] border bg-gradient-to-br from-muted/80 to-background p-3 shadow-sm">
+            <div className="overflow-hidden rounded-[22px] border bg-background">
+              <div className="relative aspect-[4/4.4]">
                 <Image
                   src="/images/hero2.jpg"
-                  alt="Profile picture"
-                  width={300} height={300}
-                  className="rounded-2xl object-cover"
-                ></Image>
-              
-              <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
-         style={{ boxShadow: "inset 0 0 120px rgba(0,0,0,0.25)" }} />
+                  alt="Portrait of Abiral Panta"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background via-background/75 to-transparent p-5">
+                  <div className="rounded-2xl border bg-background/85 p-4 backdrop-blur">
+                    <p className="text-sm font-semibold">{profile.role}</p>
+                    <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="size-4" />
+                      {profile.location}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-             </motion.div>
           </div>
-       
+        </motion.div>
       </div>
     </section>
   );
 }
 
-function About(): JSX.Element {
+function About() {
   return (
-    <section id="about" className="mx-auto max-w-6xl px-4 py-16">
-      <SectionTitle icon={Sparkles} title="About" subtitle={profile.location} />
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Who am I?</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p>
-              I’m a product‑minded engineer who enjoys clean architecture, accessible UI, and animation that serves purpose.
-              I partner with teams to ship end‑to‑end: from discovery and design to data modeling, testing, and delivery.
-            </p>
-            <p>
-              Recently, I’ve been building AI‑powered tools for pharmacies and analytics dashboards for sports data.
-            </p>
-          </CardContent>
-        </Card>
+    <section id="about" className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+      <SectionTitle
+        icon={Sparkles}
+        title="About"
+        subtitle="A developer who thinks in products, workflows, and systems"
+      />
+
+      <div className="grid gap-6 lg:grid-cols-[1.4fr_0.9fr]">
         <Card>
           <CardHeader>
-            <CardTitle>Contact</CardTitle>
+            <CardTitle>What I bring</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <a href={profile.social.email} className="flex items-center gap-2 text-sm hover:underline">
-              <Mail className="size-4"/> abiralpanta39@gmail.com
-            </a>
-            <a href={profile.social.github} className="flex items-center gap-2 text-sm hover:underline" target="_blank" rel="noreferrer">
-              <Github className="size-4"/> github.com/Abiral12
-            </a>
-            <a href={profile.social.linkedin} className="flex items-center gap-2 text-sm hover:underline" target="_blank" rel="noreferrer">
-              <Linkedin className="size-4"/> linkedin.com/in/abiral-panta-89704b272/
-            </a>
+          <CardContent className="space-y-4 text-sm leading-7 text-muted-foreground md:text-base">
+            <p>{profile.about}</p>
+            <p>{profile.niche}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick snapshot</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm">
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Focus</p>
+              <p className="mt-1 font-medium">Full-stack product engineering</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Strengths</p>
+              <p className="mt-1 font-medium">Backend logic, database design, polished frontend delivery</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Based in</p>
+              <p className="mt-1 font-medium">Kathmandu, Nepal</p>
+            </div>
+            <div className="pt-2 text-sm">
+              <a href={profile.socials.email} className="flex items-center gap-2 py-1 hover:underline">
+                <Mail className="size-4" /> abiralpanta39@gmail.com
+              </a>
+              <a
+                href={profile.socials.github}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 py-1 hover:underline"
+              >
+                <Github className="size-4" /> github.com/Abiral12
+              </a>
+              <a
+                href={profile.socials.linkedin}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 py-1 hover:underline"
+              >
+                <Linkedin className="size-4" /> linkedin.com/in/abiral-panta-89704b272/
+              </a>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -331,140 +514,156 @@ function About(): JSX.Element {
   );
 }
 
-function Skills(): JSX.Element {
+function Skills() {
   return (
-    <section id="skills" className="mx-auto max-w-6xl px-4 py-16">
-      <SectionTitle icon={Star} title="Skills" subtitle="Strong foundations, practical patterns" />
-      <motion.ul
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.2 }}
-        className="flex flex-wrap gap-2"
-      >
-        {skills.map((s) => (
-          <motion.li key={s} variants={item}>
-  <motion.div
-    whileHover={{ y: -2, scale: 1.03 }}
-    transition={SPRING_SOFT}
-    className="rounded-full"
-  >
-    <Badge
-      variant="secondary"
-      className="rounded-full px-3 py-1 text-sm shadow-sm hover:shadow transition-shadow"
-    >
-      {s}
-    </Badge>
-  </motion.div>
-</motion.li>
-        ))}
-      </motion.ul>
+    <section id="skills" className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+      <SectionTitle
+        icon={Star}
+        title="Skills"
+        subtitle="Tools are useful, but the value is in how I apply them"
+      />
+
+      <Card>
+        <CardContent className="p-6">
+          <div className="mb-5 max-w-3xl text-sm leading-7 text-muted-foreground md:text-base">
+            I am strongest when a project needs both implementation and thinking: database structure, backend flow, frontend delivery, role-based permissions, and product logic that matches real use cases.
+          </div>
+
+          <motion.ul
+            variants={container}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+            className="flex flex-wrap gap-2"
+          >
+            {skills.map((skill) => (
+              <motion.li key={skill} variants={item}>
+                <motion.div whileHover={{ y: -2, scale: 1.03 }} transition={SPRING_SOFT}>
+                  <Badge className="rounded-full px-3 py-1.5 text-sm" variant="secondary">
+                    {skill}
+                  </Badge>
+                </motion.div>
+              </motion.li>
+            ))}
+          </motion.ul>
+        </CardContent>
+      </Card>
     </section>
   );
 }
 
-function Projects(): JSX.Element {
+function Projects() {
   return (
-    <section id="projects" className="mx-auto max-w-6xl px-4 py-16">
-      <SectionTitle icon={Briefcase} title="Selected Projects" subtitle="Quality over quantity" />
-      <div className="grid gap-6 md:grid-cols-2">
-        {projects.map((p) => (
-          <motion.div
-  key={p.title}
-  initial={{ opacity: 0, y: 12 }}
-  whileInView={{ opacity: 1, y: 0 }}
-  viewport={{ once: true }}
->
-  <motion.div
-    whileHover={{ y: -6 }}
-    transition={SPRING_SOFT}
-    className="rounded-xl"
-  >
-    <Card className="h-full overflow-hidden group relative">
-      {/* animated gradient ring on hover */}
-      <div className="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-           style={{ boxShadow: "0 0 0 1px hsl(var(--ring)) inset" }} />
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span className="tracking-tight">{p.title}</span>
-          <span className="flex gap-3">
-            {p.links?.live && (
-              <motion.a
-                whileHover={{ scale: 1.05 }}
-                className="text-sm inline-flex items-center gap-1 hover:underline"
-                href={p.links.live}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Live <ExternalLink className="size-3" />
-              </motion.a>
-            )}
-            {p.links?.repo && (
-              <motion.a
-                whileHover={{ scale: 1.05 }}
-                className="text-sm inline-flex items-center gap-1 hover:underline"
-                href={p.links.repo}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Code <ExternalLink className="size-3" />
-              </motion.a>
-            )}
-          </span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="aspect-[16/9] w-full rounded-xl border overflow-hidden bg-gradient-to-br from-muted to-background">
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.5, ease: EASE }}
-            className="h-full w-full"
-          >
-            <Image
-              src={p.image || "/fallback.png"}
-              alt="Project screenshot"
-              width={1200}
-              height={675}
-              className="h-full w-full object-cover"
-            />
-          </motion.div>
-        </div>
-        <p className="text-sm text-muted-foreground">{p.desc}</p>
-        <div className="flex flex-wrap gap-2">
-          {p.tags.map((t) => (
-            <motion.div key={t} whileHover={{ y: -2 }} transition={SPRING_SOFT}>
-              <Badge variant="outline" className="rounded-full">{t}</Badge>
-            </motion.div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  </motion.div>
+    <section id="projects" className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+      <SectionTitle
+        icon={Briefcase}
+        title="Selected Projects"
+        subtitle="Projects that reflect my actual engineering potential"
+      />
 
-  </motion.div>
+      <div className="grid gap-6 md:grid-cols-2">
+        {projects.map((project) => (
+          <motion.div
+            key={project.title}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+          >
+            <motion.div whileHover={{ y: -6 }} transition={SPRING_SOFT}>
+              <Card className="group h-full overflow-hidden border-border/70">
+                <div className="relative aspect-[16/9] overflow-hidden border-b bg-muted/40">
+                  <Image
+                    src={project.image}
+                    alt={`${project.title} screenshot`}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  />
+                </div>
+
+                <CardHeader className="space-y-3">
+                  <div className="flex items-start justify-between gap-4">
+                    <CardTitle className="text-xl tracking-tight">{project.title}</CardTitle>
+                    <div className="flex shrink-0 items-center gap-3 text-sm">
+                      {project.links.live && project.links.live !== "#" ? (
+                        <a
+                          href={project.links.live}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 hover:underline"
+                        >
+                          Live <ExternalLink className="size-3" />
+                        </a>
+                      ) : null}
+                      {project.links.repo && project.links.repo !== "#" ? (
+                        <a
+                          href={project.links.repo}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 hover:underline"
+                        >
+                          Code <ExternalLink className="size-3" />
+                        </a>
+                      ) : null}
+                    </div>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  <p className="text-sm leading-7 text-muted-foreground">{project.summary}</p>
+                  <div className="rounded-2xl border bg-muted/30 p-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                      Why it matters
+                    </p>
+                    <p className="mt-2 text-sm leading-7">{project.impact}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {project.tags.map((tag) => (
+                      <Badge key={tag} variant="outline" className="rounded-full">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </motion.div>
         ))}
       </div>
     </section>
   );
 }
 
-function Experience(): JSX.Element {
+function Experience() {
   return (
-    <section id="experience" className="mx-auto max-w-6xl px-4 py-16">
-      <SectionTitle icon={Code2} title="Experience" subtitle="Impact and responsibilities" />
+    <section id="experience" className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+      <SectionTitle
+        icon={Code2}
+        title="Experience"
+        subtitle="Evidence of ownership, delivery, and technical growth"
+      />
+
       <div className="space-y-6">
-        {experience.map((e) => (
-          <motion.div key={e.company} initial={{ opacity: 0, x: -10 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+        {experience.map((entry) => (
+          <motion.div
+            key={`${entry.company}-${entry.role}`}
+            initial={{ opacity: 0, x: -10 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+          >
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>{e.role} · <span className="text-muted-foreground">{e.company}</span></span>
-                  <span className="text-sm text-muted-foreground">{e.period}</span>
+                <CardTitle className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                  <span>
+                    {entry.role} <span className="text-muted-foreground">· {entry.company}</span>
+                  </span>
+                  <span className="text-sm font-normal text-muted-foreground">{entry.period}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="list-disc pl-5 space-y-2 text-sm">
-                  {e.bullets.map((b) => (<li key={b}>{b}</li>))}
+                <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-muted-foreground">
+                  {entry.bullets.map((bullet) => (
+                    <li key={bullet}>{bullet}</li>
+                  ))}
                 </ul>
               </CardContent>
             </Card>
@@ -475,75 +674,156 @@ function Experience(): JSX.Element {
   );
 }
 
-function Contact(): JSX.Element {
-  const [pending, setPending] = useState<boolean>(false);
+function Contact() {
+  const [pending, setPending] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
   return (
-    <section id="contact" className="mx-auto max-w-6xl px-4 py-16">
-      <SectionTitle icon={Phone} title="Contact" subtitle="Let’s build something great" />
-      <Card>
-        <CardContent className="pt-6">
-          <form
-            onSubmit={async (e) => {
-  e.preventDefault();
-  try {
-    setPending(true);
-    const form = e.currentTarget as HTMLFormElement;
-    const formData = new FormData(form);
-    const payload = {
-      name: String(formData.get("name") || ""),
-      email: String(formData.get("email") || ""),
-      message: String(formData.get("message") || ""),
-      botField: String(formData.get("company") || ""), // honeypot
-    };
+    <section id="contact" className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+      <SectionTitle
+        icon={Phone}
+        title="Contact"
+        subtitle="For internships, freelance work, product collaboration, or technical roles"
+      />
 
-    const res = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+      <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle>Let’s talk</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 text-sm leading-7 text-muted-foreground">
+            <p>
+              I am especially interested in opportunities where I can work on real products, backend-heavy systems, internal tools, SaaS platforms, or business workflow software.
+            </p>
+            <div className="space-y-2 pt-2 text-foreground">
+              <a href={profile.socials.email} className="flex items-center gap-2 hover:underline">
+                <Mail className="size-4" /> abiralpanta39@gmail.com
+              </a>
+              <a
+                href={profile.socials.linkedin}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 hover:underline"
+              >
+                <Linkedin className="size-4" /> LinkedIn
+              </a>
+              <a
+                href={profile.socials.github}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 hover:underline"
+              >
+                <Github className="size-4" /> GitHub
+              </a>
+            </div>
+          </CardContent>
+        </Card>
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || "Failed to send");
-    form.reset();
-    alert("Thanks! Your message is on its way ✉️");
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Something went wrong.";
-    alert(message);
-  } finally {
-    setPending(false);
-  }
-}}
+        <Card>
+          <CardContent className="pt-6">
+            <form
+              className="grid gap-4 md:grid-cols-2"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setStatus(null);
+                setError(null);
 
-            className="grid gap-4 md:grid-cols-2"
-          >
-            <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" name="name" placeholder="Your name" required />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" placeholder="you@example.com" required />
-            </div>
-            <div className="grid gap-2 md:col-span-2">
-              <Label htmlFor="message">Message</Label>
-              <Textarea id="message" name="message" placeholder="Tell me about your project…" rows={5} />
-              <input type="text" name="company" autoComplete="off" tabIndex={-1} className="hidden" />
-            </div>
-            <div className="md:col-span-2">
-              <Button type="submit" disabled={pending}>
-                {pending ? "Sending…" : "Send message"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+                try {
+                  setPending(true);
+                  const form = e.currentTarget as HTMLFormElement;
+                  const formData = new FormData(form);
+
+                  const payload = {
+                    name: String(formData.get("name") || "").trim(),
+                    email: String(formData.get("email") || "").trim(),
+                    message: String(formData.get("message") || "").trim(),
+                    botField: String(formData.get("company") || ""),
+                  };
+
+                  const res = await fetch("/api/contact", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                  });
+
+                  const data = await res.json();
+                  if (!res.ok) {
+                    throw new Error(data?.error || "Failed to send message.");
+                  }
+
+                  form.reset();
+                  setStatus("Message sent successfully.");
+                } catch (err: unknown) {
+                  const message = err instanceof Error ? err.message : "Something went wrong.";
+                  setError(message);
+                } finally {
+                  setPending(false);
+                }
+              }}
+            >
+              <div className="grid gap-2">
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" name="name" placeholder="Your name" required />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" name="email" type="email" placeholder="you@example.com" required />
+              </div>
+
+              <div className="grid gap-2 md:col-span-2">
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  name="message"
+                  placeholder="Tell me about the role, project, or collaboration..."
+                  rows={6}
+                  required
+                />
+                <input type="text" name="company" autoComplete="off" tabIndex={-1} className="hidden" />
+              </div>
+
+              <div className="md:col-span-2 flex flex-col items-start gap-3">
+                <Button type="submit" disabled={pending}>
+                  {pending ? "Sending..." : "Send message"}
+                </Button>
+
+                {status ? <p className="text-sm text-green-600 dark:text-green-400">{status}</p> : null}
+                {error ? <p className="text-sm text-red-600 dark:text-red-400">{error}</p> : null}
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </section>
   );
 }
 
-export default function PortfolioPage(): JSX.Element {
-  const year = useMemo<number>(() => new Date().getFullYear(), []);
+function Footer() {
+  const year = useMemo(() => new Date().getFullYear(), []);
 
+  return (
+    <footer className="mt-16 border-t">
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm text-muted-foreground md:flex-row">
+        <p>© {year} {profile.name}. Built with Next.js and intention.</p>
+        <div className="flex items-center gap-4">
+          <a href={profile.socials.github} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:underline">
+            <Github className="size-4" /> GitHub
+          </a>
+          <a href={profile.socials.linkedin} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:underline">
+            <Linkedin className="size-4" /> LinkedIn
+          </a>
+          <a href={profile.socials.email} className="inline-flex items-center gap-1 hover:underline">
+            <Mail className="size-4" /> Email
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+export default function PortfolioPage(): JSX.Element {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <div className="min-h-screen bg-background text-foreground">
@@ -556,22 +836,7 @@ export default function PortfolioPage(): JSX.Element {
           <Experience />
           <Contact />
         </main>
-        <footer className="border-t mt-16">
-          <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-muted-foreground flex flex-col md:flex-row items-center justify-between gap-2">
-            <p>© {year} {profile.name}. All rights reserved.</p>
-            <div className="flex items-center gap-3">
-              <a className="inline-flex items-center gap-1 hover:underline" href={profile.social.github} target="_blank" rel="noreferrer">
-                <Github className="size-4"/> GitHub
-              </a>
-              <a className="inline-flex items-center gap-1 hover:underline" href={profile.social.linkedin} target="_blank" rel="noreferrer">
-                <Linkedin className="size-4"/> LinkedIn
-              </a>
-              <a className="inline-flex items-center gap-1 hover:underline" href={profile.social.email}>
-                <Mail className="size-4"/> Email
-              </a>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </ThemeProvider>
   );
